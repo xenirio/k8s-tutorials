@@ -42,8 +42,8 @@ metadata:
     app: guestbook
     tier: frontend
 spec:
-  type: {{ .Values.redisMaster.service.type }}
-  {{- with .Values.redisMaster.service.ports }}
+  type: {{ .Values.frontend.service.type }}
+  {{- with .Values.frontend.service.ports }}
   ports:
     {{- toYaml . | nindent 8 }}
   {{- end }}

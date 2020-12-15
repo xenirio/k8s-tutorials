@@ -20,6 +20,10 @@ To perform helm deployment, do the following
 ```bash
 $ helm upgrade --install guestbook ./php-guestbook
 ```
+To get the IP address for the frontend Service
+```bash
+$ minikube service frontend --url
+```
 
 ### 2. Example: Deploying WordPress and MySQL with Persistent Volumes ([https://kubernetes.io/docs/tutorials/stateful-application/mysql-wordpress-persistent-volume/](https://kubernetes.io/docs/tutorials/stateful-application/mysql-wordpress-persistent-volume/))
 
@@ -35,4 +39,12 @@ $ kubectl kustomize ./wordpress-mysql/outputs > ./wordpress-mysql/templates/depl
 3. Perform the deployment.
 ```bash
 $ helm upgrade --install wordpress ./wordpress-mysql --set template.enabled=false
+```
+
+### 3. Example: Deploying Cassandra with a StatefulSet ([https://kubernetes.io/docs/tutorials/stateful-application/cassandra/](https://kubernetes.io/docs/tutorials/stateful-application/cassandra/))
+
+To avoid insufficient resource, start Minikube with the following settings:
+```bash
+$ minikube delete
+$ minikube start --memory 5120 --cpus=4
 ```
