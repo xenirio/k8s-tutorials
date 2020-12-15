@@ -1,0 +1,72 @@
+{{- if .Values.template.enabled -}}
+apiVersion: v1
+kind: Service
+metadata:
+  name: wordpress-mysql
+  labels:
+    app: wordpress
+spec:
+  {{- with .Values.mysql.service.ports }}
+  ports:
+    {{- toYaml . | nindent 8 }}
+  {{- end }}
+  selector:
+    app: wordpress
+    tier: mysql
+  clusterIP: None
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: mysql-pv-claim
+  labels:
+    app: wordpress
+spec:
+  {{- with .Values.mysql.volume.accessModes }}
+  accessModes:
+    {{- toYaml . | nindent 8 }}
+  {{- end }}
+  resources:
+    requests:
+      storage: {{ .Values.mysql.volume.storage }}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: wordpress-mysql
+  labels:
+    app: wordpress
+spec:
+  selector:
+    matchLabels:
+      app: wordpress
+      tier: mysql
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: wordpress
+        tier: mysql
+    spec:
+      containers:
+        - image: {{ .Values.mysql.image }}
+          name: mysql
+          env:
+            - name: MYSQL_ROOT_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: mysql-pass
+                  key: password
+          ports:
+            - containerPort: {{ .Values.mysql.containerPort }}
+              name: mysql
+          {{- with .Values.mysql.volumeMounts }}
+          volumeMounts:
+            {{- toYaml . | nindent 10 }}
+          {{- end }}
+      {{- with .Values.mysql.volumns }}
+      volumes:
+        {{- toYaml . | nindent 6 }}
+      {{- end }}
+{{- end }}
