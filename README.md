@@ -13,7 +13,8 @@ This repository contains 4 Helm charts that following the tutorials.
    $ minikube start
    ```
 
-## 1. Example: Deploying PHP Guestbook application with Redis ([https://kubernetes.io/docs/tutorials/stateless-application/guestbook/](https://kubernetes.io/docs/tutorials/stateless-application/guestbook/))
+# Exercise Helm Charts
+### 1. Example: Deploying PHP Guestbook application with Redis ([https://kubernetes.io/docs/tutorials/stateless-application/guestbook/](https://kubernetes.io/docs/tutorials/stateless-application/guestbook/))
 
 To perform helm deployment, do the following  
 ```bash
