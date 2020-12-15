@@ -7,10 +7,10 @@ metadata:
     role: master
     tier: backend
 spec:
+  {{- with .Values.redisMaster.service.ports }}
   ports:
-  - name: redis
-    port: 6379
-    targetPort: 6379
+    {{- toYaml . | nindent 8 }}
+  {{- end }}
   selector:
     app: redis
     role: master
@@ -25,8 +25,10 @@ metadata:
     role: slave
     tier: backend
 spec:
+  {{- with .Values.redisMaster.service.ports }}
   ports:
-  - port: 6379
+    {{- toYaml . | nindent 8 }}
+  {{- end }}
   selector:
     app: redis
     role: slave
@@ -40,9 +42,11 @@ metadata:
     app: guestbook
     tier: frontend
 spec:
-  type: NodePort
+  type: {{ .Values.redisMaster.service.type }}
+  {{- with .Values.redisMaster.service.ports }}
   ports:
-  - port: 80
+    {{- toYaml . | nindent 8 }}
+  {{- end }}
   selector:
     app: guestbook
     tier: frontend
