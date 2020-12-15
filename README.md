@@ -9,9 +9,9 @@ This repository contains 4 Helm charts that following the tutorials.
 ## Getting Started
 1. Install prerequisites tool above.
 2. Start the minikube cluster.
-   ```bash
-   $ minikube start
-   ```
+```bash
+$ minikube start
+```
 
 ## Exercise Helm Charts
 ### 1. Example: Deploying PHP Guestbook application with Redis ([https://kubernetes.io/docs/tutorials/stateless-application/guestbook/](https://kubernetes.io/docs/tutorials/stateless-application/guestbook/))
@@ -28,17 +28,21 @@ $ minikube service frontend --url
 ### 2. Example: Deploying WordPress and MySQL with Persistent Volumes ([https://kubernetes.io/docs/tutorials/stateful-application/mysql-wordpress-persistent-volume/](https://kubernetes.io/docs/tutorials/stateful-application/mysql-wordpress-persistent-volume/))
 
 To perform helm deployment, do the following  
-1. Generate deployment.yaml by templates.
+1. Generate deployment.yaml by templates
 ```bash
 $ helm template ./wordpress-mysql > ./wordpress-mysql/outputs/deployment.yaml
 ```
-2. Apply kustomization.yaml secret.
+2. Apply kustomization.yaml secret
 ```bash
 $ kubectl kustomize ./wordpress-mysql/outputs > ./wordpress-mysql/templates/deployment.yaml
 ```
-3. Perform the deployment.
+3. Perform the deployment
 ```bash
 $ helm upgrade --install wordpress ./wordpress-mysql --set template.enabled=false
+```
+To get the IP address for the wordpress Service
+```bash
+$ minikube service wordpress --url
 ```
 
 ### 3. Example: Deploying Cassandra with a StatefulSet ([https://kubernetes.io/docs/tutorials/stateful-application/cassandra/](https://kubernetes.io/docs/tutorials/stateful-application/cassandra/))
