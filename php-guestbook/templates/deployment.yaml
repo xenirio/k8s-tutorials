@@ -10,7 +10,7 @@ spec:
       app: redis
       role: master
       tier: backend
-  replicas: 1
+  replicas: {{ .Values.redisMaster.replicaCount }}
   template:
     metadata:
       labels:
@@ -20,13 +20,13 @@ spec:
     spec:
       containers:
         - name: master
-          image: k8s.gcr.io/redis:e2e
+          image: {{ .Values.redisMaster.image }}
           resources:
             requests:
-              cpu: 100m
-              memory: 100Mi
+              cpu: {{ .Values.redisMaster.cpu }}
+              memory: {{ .Values.redisMaster.memory }}
           ports:
-            - containerPort: 6379
+            - containerPort: {{ .Values.redisMaster.containerPort }}
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -40,7 +40,7 @@ spec:
       app: redis
       role: slave
       tier: backend
-  replicas: 2
+  replicas: {{ .Values.redisSlave.replicaCount }}
   template:
     metadata:
       labels:
@@ -50,16 +50,16 @@ spec:
     spec:
       containers:
         - name: slave
-          image: gcr.io/google_samples/gb-redisslave:v3
+          image: {{ .Values.redisSlave.image }}
           resources:
             requests:
-              cpu: 100m
-              memory: 100Mi
+              cpu: {{ .Values.redisMaster.cpu }}
+              memory: {{ .Values.redisMaster.memory }}
           env:
             - name: GET_HOSTS_FROM
               value: dns
           ports:
-            - containerPort: 6379
+            - containerPort: {{ .Values.redisMaster.containerPort }}
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -72,7 +72,7 @@ spec:
     matchLabels:
       app: guestbook
       tier: frontend
-  replicas: 3
+  replicas: {{ .Values.frontend.replicaCount }}
   template:
     metadata:
       labels:
@@ -81,13 +81,13 @@ spec:
     spec:
       containers:
         - name: php-redis
-          image: gcr.io/google-samples/gb-frontend:v4
+          image: {{ .Values.frontend.image }}
           resources:
             requests:
-              cpu: 100m
-              memory: 100Mi
+              cpu: {{ .Values.frontend.cpu }}
+              memory: {{ .Values.frontend.memory }}
           env:
             - name: GET_HOSTS_FROM
               value: dns
           ports:
-            - containerPort: 80
+            - containerPort: {{ .Values.frontend.containerPort }}
