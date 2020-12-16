@@ -1,0 +1,51 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{ include "cassandra-statefulset.fullname" . }}
+  labels:
+    app: {{ include "cassandra-statefulset.fullname" . }}
+spec:
+  serviceName: {{ .Values.serviceName }}
+  {{- if not .Values.autoscaling.enabled }}
+  replicas: {{ .Values.replicaCount }}
+  {{- end }}
+  selector:
+    matchLabels:
+      app: {{ include "cassandra-statefulset.fullname" . }}
+  template:
+    metadata:
+      labels:
+        app: {{ include "cassandra-statefulset.fullname" . }}
+    spec:
+      terminationGracePeriodSeconds: {{ .Values.terminationGracePeriodSeconds }}
+      containers:
+        - name: {{ include "cassandra-statefulset.fullname" . }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            {{- toYaml .Values.ports | nindent 12 }}
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          lifecycle:
+            {{- toYaml .Values.lifecycle | nindent 12 }}
+          env:
+            {{- toYaml .Values.env | nindent 12 }}
+          readinessProbe:
+            {{- toYaml .Values.readinessProbe | nindent 12 }}
+          volumeMounts:
+            {{- toYaml .Values.volumeMounts | nindent 12 }}
+  volumeClaimTemplates:
+    - metadata:
+        name: cassandra-data
+      spec:
+        {{- toYaml .Values.volumeClaimTemplates.spec | nindent 8 }}
+---
+kind: StorageClass
+apiVersion: storage.k8s.io/v1
+metadata:
+  name: {{ .Values.storage.name }}
+provisioner: k8s.io/minikube-hostpath
+parameters:
+  type: {{ .Values.storage.type }}

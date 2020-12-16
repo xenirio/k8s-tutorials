@@ -16,18 +16,18 @@ $ minikube start
 ## Exercise Helm Charts
 ### 1. Example: Deploying PHP Guestbook application with Redis ([https://kubernetes.io/docs/tutorials/stateless-application/guestbook/](https://kubernetes.io/docs/tutorials/stateless-application/guestbook/))
 
-To perform helm deployment, do the following  
+To perform helm deployment:
 ```bash
 $ helm upgrade --install guestbook ./php-guestbook
 ```
-To get the IP address for the frontend Service
+To get the IP address for the frontend Service:
 ```bash
 $ minikube service frontend --url
 ```
 
 ### 2. Example: Deploying WordPress and MySQL with Persistent Volumes ([https://kubernetes.io/docs/tutorials/stateful-application/mysql-wordpress-persistent-volume/](https://kubernetes.io/docs/tutorials/stateful-application/mysql-wordpress-persistent-volume/))
 
-To perform helm deployment, do the following  
+To perform helm deployment:
 1. Generate deployment.yaml by templates
 ```bash
 $ helm template ./wordpress-mysql > ./wordpress-mysql/outputs/deployment.yaml
@@ -40,15 +40,24 @@ $ kubectl kustomize ./wordpress-mysql/outputs > ./wordpress-mysql/templates/depl
 ```bash
 $ helm upgrade --install wordpress ./wordpress-mysql --set template.enabled=false
 ```
-To get the IP address for the wordpress Service
+To get the IP address for the wordpress Service:
 ```bash
 $ minikube service wordpress --url
 ```
 
 ### 3. Example: Deploying Cassandra with a StatefulSet ([https://kubernetes.io/docs/tutorials/stateful-application/cassandra/](https://kubernetes.io/docs/tutorials/stateful-application/cassandra/))
 
-To avoid insufficient resource, start Minikube with the following settings:
+To perform helm deployment:
+1. Remove and recreate Minikube to avoid insufficient resource, start Minikube with the following settings
 ```bash
 $ minikube delete
 $ minikube start --memory 5120 --cpus=4
+```
+2. Perform the deployment
+```bash
+$ helm upgrade --install cassandra ./cassandra-statefulset
+```
+To get Cassandra StatefulSet:
+```bash
+$ kubectl get statefulset cassandra
 ```

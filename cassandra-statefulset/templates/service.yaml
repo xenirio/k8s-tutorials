@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: {{ include "cassandra-statefulset.fullname" . }}
+  name: {{ include "cassandra-statefulset.fullname" . }}
+spec:
+  clusterIP: None
+  ports:
+  - port: {{ .Values.service.port }}
+  selector:
+    app: {{ include "cassandra-statefulset.fullname" . }}

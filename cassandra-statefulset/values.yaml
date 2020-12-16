@@ -1,0 +1,159 @@
+# Default values for cassandra-statefulset.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+serviceName: cassandra
+replicaCount: 3
+terminationGracePeriodSeconds: 1800
+
+image:
+  repository: gcr.io/google-samples/cassandra
+  pullPolicy: Always
+  # Overrides the image tag whose default is the chart appVersion.
+  tag: v13
+
+ports:
+  - containerPort: 7000
+    name: intra-node
+  - containerPort: 7001
+    name: tls-intra-node
+  - containerPort: 7199
+    name: jmx
+  - containerPort: 9042
+    name: cql
+
+lifecycle:
+  preStop:
+    exec:
+      command:
+        - /bin/sh
+        - -c
+        - nodetool drain
+
+env:
+  - name: MAX_HEAP_SIZE
+    value: 512M
+  - name: HEAP_NEWSIZE
+    value: 100M
+  - name: CASSANDRA_SEEDS
+    value: "cassandra-0.cassandra.default.svc.cluster.local"
+  - name: CASSANDRA_CLUSTER_NAME
+    value: "K8Demo"
+  - name: CASSANDRA_DC
+    value: "DC1-K8Demo"
+  - name: CASSANDRA_RACK
+    value: "Rack1-K8Demo"
+  - name: POD_IP
+    valueFrom:
+      fieldRef:
+        fieldPath: status.podIP
+
+readinessProbe:
+  exec:
+    command:
+      - /bin/bash
+      - -c
+      - /ready-probe.sh
+  initialDelaySeconds: 15
+  timeoutSeconds: 5
+
+# These volume mounts are persistent. They are like inline claims,
+# but not exactly because the names need to match exactly one of
+# the stateful pod volumes.
+volumeMounts:
+  - name: cassandra-data
+    mountPath: /cassandra_data
+
+# These are converted to volume claims by the controller
+# and mounted at the paths mentioned above.
+# do not use these in production until ssd GCEPersistentDisk or other ssd pd
+volumeClaimTemplates:
+  spec:
+    accessModes: ["ReadWriteOnce"]
+    storageClassName: fast
+    resources:
+      requests:
+        storage: 1Gi
+
+storage:
+  name: fast
+  type: pd-ssd
+
+service:
+  type: ClusterIP
+  port: 9042
+
+ingress:
+  enabled: false
+  annotations:
+    {}
+    # kubernetes.io/ingress.class: nginx
+    # kubernetes.io/tls-acme: "true"
+  hosts:
+    - host: chart-example.local
+      paths: []
+  tls: []
+  #  - secretName: chart-example-tls
+  #    hosts:
+  #      - chart-example.local
+
+resources:
+  limits:
+    cpu: "500m"
+    memory: 1Gi
+  requests:
+    cpu: "500m"
+    memory: 1Gi
+  # We usually recommend not to specify default resources and to leave this as a conscious
+  # choice for the user. This also increases chances charts run on environments with little
+  # resources, such as Minikube. If you do want to specify resources, uncomment the following
+  # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+  # limits:
+  #   cpu: 100m
+  #   memory: 128Mi
+  # requests:
+  #   cpu: 100m
+  #   memory: 128Mi
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: "cassandra"
+
+serviceAccount:
+  # Specifies whether a service account should be created
+  create: true
+  # Annotations to add to the service account
+  annotations: {}
+  # The name of the service account to use.
+  # If not set and create is true, a name is generated using the fullname template
+  name: ""
+
+podAnnotations: {}
+
+podSecurityContext:
+  {}
+  # fsGroup: 2000
+
+securityContext:
+  capabilities:
+    add:
+      - IPC_LOCK
+  # capabilities:
+  #   drop:
+  #   - ALL
+  # readOnlyRootFilesystem: true
+  # runAsNonRoot: true
+  # runAsUser: 1000
+
+autoscaling:
+  enabled: false
+  minReplicas: 1
+  maxReplicas: 100
+  targetCPUUtilizationPercentage: 80
+  # targetMemoryUtilizationPercentage: 80
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
