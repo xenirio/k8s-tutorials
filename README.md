@@ -24,6 +24,10 @@ To get the IP address for the frontend Service:
 ```bash
 $ minikube service frontend --url
 ```
+To uninstall resources:
+```bash
+$ helm uninstall guestbook
+```
 
 ### 2. Example: Deploying WordPress and MySQL with Persistent Volumes ([https://kubernetes.io/docs/tutorials/stateful-application/mysql-wordpress-persistent-volume/](https://kubernetes.io/docs/tutorials/stateful-application/mysql-wordpress-persistent-volume/))
 
@@ -44,6 +48,10 @@ To get the IP address for the wordpress Service:
 ```bash
 $ minikube service wordpress --url
 ```
+To uninstall resources:
+```bash
+$ helm uninstall wordpress
+```
 
 ### 3. Example: Deploying Cassandra with a StatefulSet ([https://kubernetes.io/docs/tutorials/stateful-application/cassandra/](https://kubernetes.io/docs/tutorials/stateful-application/cassandra/))
 
@@ -60,4 +68,17 @@ $ helm upgrade --install cassandra ./cassandra-statefulset
 To get Cassandra StatefulSet:
 ```bash
 $ kubectl get statefulset cassandra
+```
+To uninstall resources:
+```bash
+$ helm uninstall cassandra
+```
+
+### 4. Running ZooKeeper, A Distributed System Coordinator ([https://kubernetes.io/docs/tutorials/stateful-application/zookeeper/](https://kubernetes.io/docs/tutorials/stateful-application/zookeeper/))
+
+To perform helm deployment:
+1. Remove and recreate Minikube to avoid insufficient resource, start Minikube with the following settings
+```bash
+$ minikube delete
+$ minikube start --memory 5120 --cpus=4
 ```

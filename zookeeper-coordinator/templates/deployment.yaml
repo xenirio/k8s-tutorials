@@ -1,0 +1,51 @@
+apiVersion: policy/v1beta1
+kind: PodDisruptionBudget
+metadata:
+  name: zk-pdb
+spec:
+  selector:
+    matchLabels:
+      app: {{ include "zookeeper-coordinator.fullname" . }}
+  maxUnavailable: {{ .Values.maxUnavailable }}
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{ include "zookeeper-coordinator.fullname" . }}
+spec:
+  selector:
+    matchLabels:
+      app: {{ include "zookeeper-coordinator.fullname" . }}
+  serviceName: zk-hs
+  replicas: {{ .Values.statefulSet.replicaCount }}
+  updateStrategy:
+    type: {{ .Values.statefulSet.updateStrategy }}
+  podManagementPolicy: {{ .Values.statefulSet.podManagementPolicy }}
+  template:
+    metadata:
+      labels:
+        app: {{ include "zookeeper-coordinator.fullname" . }}
+    spec:
+      affinity:
+        podAntiAffinity:
+          {{- toYaml .Values.statefulSet.podAntiAffinity | nindent 10 }}
+      containers:
+      - name: kubernetes-zookeeper
+        imagePullPolicy: {{ .Values.statefulSet.image.pullPolicy }}
+        image: "{{ .Values.statefulSet.image.repository }}:{{ .Values.statefulSet.image.tag | default .Chart.AppVersion }}"
+        resources:
+          {{- toYaml .Values.statefulSet.resources | nindent 10 }}
+        ports:
+          {{- toYaml .Values.statefulSet.ports | nindent 10 }}
+        command:
+          {{- toYaml .Values.statefulSet.command | nindent 10 }}
+        readinessProbe:
+          {{- toYaml .Values.statefulSet.readinessProbe | nindent 10 }}
+        livenessProbe:
+          {{- toYaml .Values.statefulSet.livenessProbe | nindent 10 }}
+        volumeMounts:
+          {{- toYaml .Values.statefulSet.volumeMounts | nindent 10 }}
+      securityContext:
+        {{- toYaml .Values.statefulSet.securityContext | nindent 8 }}
+  volumeClaimTemplates:
+    {{- toYaml .Values.statefulSet.volumeClaimTemplates | nindent 4 }}
