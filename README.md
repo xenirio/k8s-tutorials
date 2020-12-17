@@ -76,9 +76,23 @@ $ helm uninstall cassandra
 
 ### 4. Running ZooKeeper, A Distributed System Coordinator ([https://kubernetes.io/docs/tutorials/stateful-application/zookeeper/](https://kubernetes.io/docs/tutorials/stateful-application/zookeeper/))
 
+You will require a cluster with at least four nodes, and each node requires at least 2 CPUs and 4 GiB of memory.
+So, I perform the deployment with the GKE cluster.
+
 To perform helm deployment:
-1. Remove and recreate Minikube to avoid insufficient resource, start Minikube with the following settings
+1. Connect to the GKE cluster
 ```bash
-$ minikube delete
-$ minikube start --memory 5120 --cpus=4
+$ gcloud container clusters get-credentials [cluster name] --zone [zone] --project [project id]
+```
+2. Perform the deployment
+```bash
+$ helm upgrade --install zookeeper ./zookeeper-coordinator
+```
+3. Check the StatefulSet's Pods, Use `CTRL-C` to terminate to kubectl when all Pods is running.
+```bash
+$ kubectl get pods -w -l app=zk
+```
+To uninstall resources:
+```bash
+$ helm uninstall zookeeper
 ```

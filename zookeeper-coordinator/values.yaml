@@ -5,7 +5,7 @@
 maxUnavailable: 1
 
 statefulSet:
-  replicaCount: 2
+  replicaCount: 3
   updateStrategy: RollingUpdate
   podManagementPolicy: OrderedReady
   podAntiAffinity:
@@ -44,7 +44,7 @@ statefulSet:
     - sh
     - -c
     - "start-zookeeper \
-      --servers=2 \
+      --servers=3 \
       --data_dir=/var/lib/zookeeper/data \
       --data_log_dir=/var/lib/zookeeper/data/log \
       --conf_dir=/opt/zookeeper/conf \
@@ -90,7 +90,7 @@ statefulSet:
         accessModes: ["ReadWriteOnce"]
         resources:
           requests:
-            storage: 10Gi
+            storage: 5Gi
 imagePullSecrets: []
 nameOverride: ""
 fullnameOverride: "zk"
